@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from users.models import User
+from users.models import User, PointsLog
 
 
 class UserAdmin(BaseUserAdmin):
@@ -14,5 +14,26 @@ class UserAdmin(BaseUserAdmin):
         ("Logs", {'fields': ('last_login', 'date_joined')})
     )
 
+    readonly_fields = ("points", )
+
+
+class PointsLogAdmin(admin.ModelAdmin):
+    list_display = ("user", "points_spent", "points_added", "created_at")
+    fieldsets = (
+        (None, {"fields": ('user', "points_spent", "points_added", "created_at")}),
+    )
+    list_filter = ("user", "created_at")
+    readonly_fields = ("user", "points_spent", "points_added", "created_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser is True
+
 
 admin.site.register(User, UserAdmin)
+admin.site.register(PointsLog, PointsLogAdmin)
