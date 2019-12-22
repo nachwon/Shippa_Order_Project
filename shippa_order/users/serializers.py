@@ -1,7 +1,8 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from users.models import User
+from users.models import User, PointsLog
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -72,16 +73,19 @@ class PointSerializer(serializers.ModelSerializer):
                 {"error": "It is not allowed to add and spend points at the same time."}
             )
 
-        points = -points_spent if points_spent else points_added
-
         return {
-            "points": points
+            "points_spent": points_spent,
+            "points_added": points_added
         }
 
     def update(self, instance, validated_data):
         points = instance.points
-        points_to_update = validated_data.get('points')
-        calculated_points = points + points_to_update
+        points_spent = validated_data.get('points_spent', 0)
+        points_added = validated_data.get('points_added', 0)
+        if points_spent:
+            calculated_points = points - points_spent
+        else:
+            calculated_points = points + points_added
 
         if calculated_points < 0:
             raise ValidationError({
@@ -89,5 +93,13 @@ class PointSerializer(serializers.ModelSerializer):
             })
 
         instance.points = calculated_points
-        instance.save()
+
+        with transaction.atomic():
+            instance.save()
+            PointsLog(
+                user=instance,
+                points_spent=points_spent,
+                points_added=points_added
+            ).save()
+
         return instance
