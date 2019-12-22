@@ -30,8 +30,35 @@ class PointSerializer(serializers.ModelSerializer):
             "points": instance.points
         }
 
+    def validate_points_spent(self, value):
+        try:
+            value = int(value)
+        except (ValueError, TypeError):
+            raise ValidationError({
+                "points_spent": "points_spent should be a positive integer."
+            })
+
+        if value and value < 0:
+            raise ValidationError("points_spent should be a positive integer.")
+
+        return value
+
+    def validate_points_added(self, value):
+        try:
+            value = int(value)
+        except (ValueError, TypeError):
+            raise ValidationError({
+                "points_added": "points_added should be a positive integer."
+            })
+
+        if value and int(value) < 0:
+            raise ValidationError("points_added should be a positive integer.")
+
+        return value
+
     def to_internal_value(self, data):
-        print('data', data)
+        data = super().to_internal_value(data)
+
         points_spent = data.get('points_spent', 0)
         points_added = data.get('points_added', 0)
 
@@ -45,12 +72,6 @@ class PointSerializer(serializers.ModelSerializer):
                 {"error": "It is not allowed to add and spend points at the same time."}
             )
 
-        if points_spent and int(points_spent) < 0:
-            raise ValidationError("points_spent should be a positive integer.")
-
-        if points_added and int(points_added) < 0:
-            raise ValidationError("points_added should be a positive integer.")
-
         points = -points_spent if points_spent else points_added
 
         return {
@@ -58,7 +79,6 @@ class PointSerializer(serializers.ModelSerializer):
         }
 
     def update(self, instance, validated_data):
-        print(validated_data)
         points = instance.points
         points_to_update = validated_data.get('points')
         calculated_points = points + points_to_update
