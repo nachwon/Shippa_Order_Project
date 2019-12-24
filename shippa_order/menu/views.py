@@ -14,3 +14,4 @@ class MenuRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MenuSerializer
     queryset = Menu.objects.all()
     permission_classes = [permissions.AllowAny]
+
