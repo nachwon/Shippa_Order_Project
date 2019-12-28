@@ -12,6 +12,7 @@ jobs:
     - name: Set up mysql docker
       run: |
         docker run -d -p 6411:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -e MYSQL_DATABASE='test_db' mysql:8.0
+        sudo apt-get install libmysqlclient-dev
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
