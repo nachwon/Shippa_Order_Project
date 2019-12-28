@@ -9,18 +9,23 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import json
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), '.secrets.json')
+
+# Secret file
+with open(SECRET_DIR, 'r') as f:
+    secrets = json.loads(f.read())
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6ew6e-ql!dgc1c5%n=pd@j^lxj)f$^rxiis#vy2t_6k9q3rp7%'
+SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,10 +85,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+connection_info = secrets['DB_CONNECTION_INFO']
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': connection_info['NAME'],
+        'USER': connection_info['USER'],
+        'PASSWORD': connection_info['PASSWORD'],
+        'HOST': connection_info['HOST'],
+        'PORT': '3306',
     }
 }
 
