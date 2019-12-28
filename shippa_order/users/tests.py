@@ -13,11 +13,11 @@ class TestPoints(TestCase):
     view = PointRetrieveUpdateView.as_view()
 
     def setUp(self) -> None:
-        user = User.objects.create(username="test_user", is_superuser=True, is_staff=True)
+        user = User.objects.create(id=1, username="test_user", is_superuser=True, is_staff=True)
         user.set_password("test_password")
         user.save()
 
-        User.objects.create(username="user_with_points", points=50000)
+        User.objects.create(id=2, username="user_with_points", points=50000)
 
         self.client.login(username="test_user", password="test_password")
 
