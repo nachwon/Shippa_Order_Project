@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Set up mysql docker
       run: |
-        docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -e MYSQL_DATABASE='test_db' mysql:8.0
+        docker run -d -p 6411:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -e MYSQL_DATABASE='test_db' mysql:8.0
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
