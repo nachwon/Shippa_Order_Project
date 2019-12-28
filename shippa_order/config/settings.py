@@ -9,18 +9,22 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import json
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONF_DIR = os.path.join(os.path.dirname(BASE_DIR), '.config')
+with open(os.path.join(CONF_DIR, 'config.json')) as secret_file:
+    secret = json.loads(secret_file.read())
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6ew6e-ql!dgc1c5%n=pd@j^lxj)f$^rxiis#vy2t_6k9q3rp7%'
+SECRET_KEY = secret['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,9 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-
     'users',
-    'menu'
+    'menu',
+    'order',
+    'merchants'
 ]
 
 AUTH_USER_MODEL = 'users.User'
