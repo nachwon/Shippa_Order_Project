@@ -323,5 +323,5 @@ $RECYCLE.BIN/
 
 # secrets
 
-.secrets/
+.secrets.json
 # End of https://www.gitignore.io/api/linux,macos,python,django,windows,pycharm+all
