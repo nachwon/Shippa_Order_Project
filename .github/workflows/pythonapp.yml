@@ -9,9 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up docker
+    - name: Set up mysql docker
       run: |
-        docker -v
+        docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -e MYSQL_DATABASE='test_db' mysql:8.0
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
@@ -31,4 +31,5 @@ jobs:
     - name: Test Django
       run: |
         cd shippa_order
+        export ENV_NAME=test
         python manage.py test
