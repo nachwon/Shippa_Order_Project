@@ -1,0 +1,1 @@
+DEFAULT_POINTS = 0
