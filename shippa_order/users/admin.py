@@ -5,16 +5,16 @@ from users.models import User, PointsLog
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name')
+    list_display = ("username", "email", "first_name", "last_name")
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ("Personal Info", {'fields': ('email', 'first_name', 'last_name')}),
-        ("Points", {'fields': ('points',)}),
-        ("Authorizations", {'fields': ('is_superuser', 'is_staff', 'is_active')}),
-        ("Logs", {'fields': ('last_login', 'date_joined')})
+        (None, {"fields": ("id", "username", "password")}),
+        ("Personal Info", {"fields": ("email", "first_name", "last_name")}),
+        ("Points", {"fields": ("points",)}),
+        ("Authorizations", {"fields": ("is_superuser", "is_staff", "is_active")}),
+        ("Logs", {"fields": ("last_login", "date_joined")})
     )
 
-    readonly_fields = ("points", )
+    readonly_fields = ("id", "points", )
 
 
 class PointsLogAdmin(admin.ModelAdmin):

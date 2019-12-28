@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'points'
         ]
         read_only_fields = [
-            'points'
+            'id', 'points'
         ]
 
 
