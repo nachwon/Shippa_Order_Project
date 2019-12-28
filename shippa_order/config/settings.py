@@ -107,7 +107,7 @@ DATABASES = {
         'USER': connection_info['USER'],
         'PASSWORD': connection_info['PASSWORD'],
         'HOST': connection_info['HOST'],
-        'PORT': '3306',
+        'PORT': connection_info['PORT'],
     }
 }
 
