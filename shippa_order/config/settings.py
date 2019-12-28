@@ -12,17 +12,15 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import json
 import os
 
+env = os.environ.get('ENV_NAME', 'local').lower()
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), '.secrets.json')
-TEST_SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), 'test.json')
+SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
 
 # Secret file
-if os.environ.get('ENV_NAME', '') == 'test':
-    SECRET_DIR = TEST_SECRET_DIR
-
 if not os.path.exists(SECRET_DIR):
-    raise FileNotFoundError("Secret data file not found. Please provide '.secrets/.secrets.json' file.")
+    raise FileNotFoundError(f"Secret data file not found. Please provide '.secrets/{env}_secrets.json' file.")
 else:
     with open(SECRET_DIR, 'r') as f:
         secrets = json.loads(f.read())
