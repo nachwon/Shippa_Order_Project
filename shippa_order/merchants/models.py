@@ -36,3 +36,29 @@ class Merchant(models.Model):
             models.Index(fields=['email', ]),
             models.Index(fields=['phone', ]),
         ]
+
+
+class Menu(models.Model):
+    # base
+    id = models.AutoField(primary_key=True, editable=False)
+    name = models.CharField(max_length=128)
+    image = models.CharField(max_length=128, null=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=3)
+    quantity = models.SmallIntegerField(default=0)
+
+    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE)
+
+    # option
+    closed = models.BooleanField(default=True)
+
+    # date
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_updated_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        order_with_respect_to = 'merchant'
+        indexes = [
+            models.Index(fields=['merchant_id', ]),
+            models.Index(fields=['merchant_id', 'closed', ]),
+        ]
