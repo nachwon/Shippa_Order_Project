@@ -33,7 +33,7 @@ else:
 SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if env == 'prod' else True
 
 ALLOWED_HOSTS = []
 
@@ -107,6 +107,13 @@ DATABASES = {
         'HOST': connection_info['HOST'],
         'PORT': connection_info['PORT'],
     }
+}
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 
