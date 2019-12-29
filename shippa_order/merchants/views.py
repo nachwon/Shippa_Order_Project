@@ -6,13 +6,13 @@ from merchants.serializers import MerchantSerializer, MenuSerializer
 
 
 class MerchantListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = MerchantSerializer
     queryset = Merchant.objects.all()
 
 
 class MerchantRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = MerchantSerializer
 
     def get_queryset(self):
@@ -21,7 +21,7 @@ class MerchantRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class MenuListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = MenuSerializer
 
     def get_queryset(self):
@@ -33,7 +33,7 @@ class MenuListCreateView(generics.ListCreateAPIView):
 
 
 class MenuRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = MenuSerializer
 
     def get_queryset(self):
