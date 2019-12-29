@@ -3,7 +3,9 @@ from order.models import Order, OrderItem
 
 
 class OrderAdmin(admin.ModelAdmin):
-    pass
+    fieldsets = (
+
+    )
 
 
 admin.site.register(Order, OrderAdmin)
