@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from users.views import GoogleLoginHTMLView
 
 module_urls = [
     path('users/', include('users.urls'))
@@ -23,5 +24,6 @@ module_urls = [
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include(module_urls))
+    path('api/v1/', include(module_urls)),
+    path('login/google/', GoogleLoginHTMLView.as_view())
 ]
