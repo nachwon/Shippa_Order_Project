@@ -25,6 +25,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_time = models.DateTimeField(auto_now=True)
     message = models.CharField(max_length=30)
+    merchant_id = models.ForeignKey(Merchant, null=True, on_delete=models.PROTECT)
 
 
 class OrderItem(models.Model):
@@ -36,5 +37,4 @@ class OrderItem(models.Model):
     order_id = models.ForeignKey(Order, on_delete=models.PROTECT)
     menu_id = models.ForeignKey(Menu, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    merchant_id = models.ForeignKey(Merchant, null=True, on_delete=models.PROTECT)
 
