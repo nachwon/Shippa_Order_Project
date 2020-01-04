@@ -80,9 +80,6 @@ class GoogleLoginView(views.APIView):
         user, created = User.objects.get_or_create(
             username=username, email=email, first_name=first_name, last_name=last_name
         )
-        if created:
-            user.set_password('test123')
-            user.save()
 
         jwt = self.get_tokens_for_user(user)
 
