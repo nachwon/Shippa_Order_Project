@@ -16,7 +16,7 @@ env = os.environ.get('ENV_NAME', 'local').lower()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
+SECRET_DIR = os.path.join(os.path.join(BASE_DIR, '.secrets'), f'{env}_secrets.json')
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 # Secret file
@@ -36,7 +36,7 @@ SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if env == 'prod' else True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['shippaorder.d2fngxhm8z.ap-northeast-2.elasticbeanstalk.com']
 
 # Application definition
 
@@ -159,3 +159,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
