@@ -24,7 +24,7 @@ class Order(models.Model):
     status = models.CharField(max_length=10, choices=OrderStatus.choices, default=OrderStatus.Pending)
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_time = models.DateTimeField(auto_now=True)
-    message = models.CharField(max_length=30)
+    message = models.CharField(max_length=30, null=True)
     merchant_id = models.ForeignKey(Merchant, null=True, on_delete=models.PROTECT)
 
 
