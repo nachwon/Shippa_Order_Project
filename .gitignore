@@ -321,4 +321,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# secrets
+
+prod_secrets.json
+local_secrets.json
 # End of https://www.gitignore.io/api/linux,macos,python,django,windows,pycharm+all

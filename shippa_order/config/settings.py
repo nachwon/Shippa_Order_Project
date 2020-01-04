@@ -12,25 +12,33 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import json
 import os
 
+env = os.environ.get('ENV_NAME', 'local').lower()
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONF_DIR = os.path.join(os.path.dirname(BASE_DIR), '.config')
-with open(os.path.join(CONF_DIR, 'config.json')) as secret_file:
-    secret = json.loads(secret_file.read())
+SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+
+# Secret file
+if not os.path.exists(SECRET_DIR):
+    raise FileNotFoundError(f"Secret data file not found. Please provide '.secrets/{env}_secrets.json' file.")
+else:
+    with open(SECRET_DIR, 'r') as f:
+        secrets = json.loads(f.read())
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret['SECRET_KEY']
+SECRET_KEY = secrets['DJANGO_SECRET_KEY']
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if env == 'prod' else True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -66,7 +74,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,12 +93,36 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+connection_info = secrets['DB_CONNECTION_INFO']
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': connection_info['NAME'],
+        'USER': connection_info['USER'],
+        'PASSWORD': connection_info['PASSWORD'],
+        'HOST': connection_info['HOST'],
+        'PORT': connection_info['PORT'],
     }
 }
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+# Google OAuth
+google_oauth = secrets['GOOGLE_OAUTH']
+GOOGLE_CLIENT_ID = google_oauth['CLIENT_ID']
+GOOGLE_CLIENT_SECRET = google_oauth['CLIENT_SECRET']
 
 
 # Password validation

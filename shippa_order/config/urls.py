@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-
 module_urls = [
     path('users/', include('users.urls')),
     path('orders/', include('order.urls'))
+    path('merchants/', include('merchants.urls')),
 ]
 
 urlpatterns = [

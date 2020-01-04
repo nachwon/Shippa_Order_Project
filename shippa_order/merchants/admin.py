@@ -1,3 +1,5 @@
 from django.contrib import admin
+from merchants.models import Merchant, Menu
 
-# Register your models here.
+admin.site.register(Merchant)
+admin.site.register(Menu)
