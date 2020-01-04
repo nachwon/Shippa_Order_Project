@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 module_urls = [
-    path('users/', include('users.urls'))
+    path('users/', include('users.urls')),
+    path('merchants/', include('merchants.urls')),
 ]
 
 urlpatterns = [
