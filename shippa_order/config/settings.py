@@ -17,6 +17,7 @@ env = os.environ.get('ENV_NAME', 'local').lower()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 # Secret file
 if not os.path.exists(SECRET_DIR):
@@ -35,8 +36,7 @@ SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if env == 'prod' else True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -71,7 +71,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -115,6 +115,11 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+
+# Google OAuth
+google_oauth = secrets['GOOGLE_OAUTH']
+GOOGLE_CLIENT_ID = google_oauth['CLIENT_ID']
+GOOGLE_CLIENT_SECRET = google_oauth['CLIENT_SECRET']
 
 
 # Password validation

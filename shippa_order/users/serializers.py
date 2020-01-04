@@ -111,9 +111,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['user_level'] = {
-            "is_active": user.is_active,
-            "is_staff": user.is_staff,
-            "is_superuser": user.is_superuser,
-        }
+
+        permission_list = ('superuser', 'staff', 'active')
+
+        user_permission = None
+        for permission in permission_list:
+            if getattr(user, f"is_{permission}"):
+                user_permission = permission
+                break
+
+        token['user_level'] = user_permission
         return token
