@@ -44,6 +44,7 @@ class Migration(migrations.Migration):
                 ('last_updated_time', models.DateTimeField(auto_now=True)),
             ],
         ),
+
         migrations.AddIndex(
             model_name='merchant',
             index=models.Index(fields=['name'], name='merchants_m_name_bfa087_idx'),

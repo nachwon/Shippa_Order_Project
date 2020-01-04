@@ -17,7 +17,6 @@ class Merchant(models.Model):
     # ex> 1010101 AND 0000001(SAT) => 0000001 open!
     # ex> 1010101 AND 0000010(FRI) => 0000000 close!
     business_days = models.PositiveSmallIntegerField(default=0)
-
     open_time = models.TimeField(default='00:00:00')
     close_time = models.TimeField(default='00:00:00')
 

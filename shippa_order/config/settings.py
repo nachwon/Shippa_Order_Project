@@ -15,6 +15,7 @@ import os
 env = os.environ.get('ENV_NAME', 'local').lower()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
@@ -33,6 +34,7 @@ else:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if env == 'prod' else True
 
@@ -49,9 +51,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-
     'users',
-    'merchants',
+    'order',
+    'merchants'
 ]
 
 AUTH_USER_MODEL = 'users.User'
