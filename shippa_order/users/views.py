@@ -1,11 +1,8 @@
 import requests
 
-from django.conf import settings
 from django.forms import model_to_dict
-from django.shortcuts import render
 from rest_framework import generics, permissions, views
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User
