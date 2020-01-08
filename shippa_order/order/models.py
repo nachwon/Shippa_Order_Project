@@ -39,3 +39,9 @@ class OrderItem(models.Model):
     menu_id = models.ForeignKey(Menu, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
 
+    # value of total price should be menu's price * quantity
+    total_price = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def set_total_price(self, menu_price):
+        return menu_price * self.quantity
+
