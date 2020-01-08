@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 
     'rest_framework',
     'users',
@@ -66,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -122,6 +124,15 @@ REST_FRAMEWORK = {
 google_oauth = secrets['GOOGLE_OAUTH']
 GOOGLE_CLIENT_ID = google_oauth['CLIENT_ID']
 GOOGLE_CLIENT_SECRET = google_oauth['CLIENT_SECRET']
+
+
+# CORS https://www.techiediaries.com/django-cors/
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ORIGIN_WHITELIST = (
+#     'http//:localhost:8000',
+# )
 
 
 # Password validation
