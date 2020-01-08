@@ -23,8 +23,8 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('last_updated_time', models.DateTimeField(auto_now=True)),
                 ('message', models.CharField(max_length=30, null=True)),
-                ('merchant_id', models.ForeignKey(null=False, on_delete=django.db.models.deletion.PROTECT, to='merchants.Merchant')),
-                ('user_id', models.ForeignKey(null=False, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                ('merchant_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='merchants.Merchant')),
+                ('user_id', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

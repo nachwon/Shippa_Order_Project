@@ -19,14 +19,12 @@ class Order(models.Model):
         Failed = 'FAILED', _('Failed')
         Refunded = 'REFUNDED', _('Refunded')
     id = models.AutoField(primary_key=True)
-    # TODO: user_id should not be null?
-    user_id = models.ForeignKey(User, null=False, on_delete=models.SET_NULL)
+    user_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=10, choices=OrderStatus.choices, default=OrderStatus.Pending)
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_time = models.DateTimeField(auto_now=True)
     message = models.CharField(max_length=30, null=True)
-    # TODO: metchant_id should not be null?
-    merchant_id = models.ForeignKey(Merchant, null=False, on_delete=models.PROTECT)
+    merchant_id = models.ForeignKey(Merchant, null=True, on_delete=models.PROTECT)
 
 
 class OrderItem(models.Model):
