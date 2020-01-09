@@ -25,6 +25,7 @@ class Order(models.Model):
     last_updated_time = models.DateTimeField(auto_now=True)
     message = models.CharField(max_length=30, null=True)
     merchant_id = models.ForeignKey(Merchant, null=True, on_delete=models.PROTECT)
+    total_price = models.
 
 
 class OrderItem(models.Model):
@@ -37,6 +38,7 @@ class OrderItem(models.Model):
     menu_id = models.ForeignKey(Menu, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
 
+    menu_price = models.DecimalField(max_digits=12, decimal_places=2)
     # value of total price should be menu's price * quantity
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
 
