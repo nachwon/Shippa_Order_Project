@@ -16,7 +16,7 @@ env = os.environ.get('ENV_NAME', 'prod').lower()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_DIR = os.path.join(os.path.join(BASE_DIR, '.secrets'), f'{env}_secrets.json')
+SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 # Secret file
