@@ -6,7 +6,7 @@ from rest_framework.response import Response
 # Merchant API 1. 주문 -> merchant save.
 from merchants.models import Merchant, Menu
 from order.models import Order
-from order.serializers import UserOrderSerializer\
+from order.serializers import UserOrderSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
