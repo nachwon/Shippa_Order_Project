@@ -26,7 +26,7 @@ class OrderListView(generics.ListAPIView):
         resp = self.get_queryset().order_by('created_at')[offset: limit]
         serializer = self.get_serializer()
 
-        results = [serializer(r).data for r in resp]
+        results = [self.serializer_class(r).data for r in resp]
 
         return Response({
             'pagination': {
