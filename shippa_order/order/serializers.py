@@ -67,7 +67,7 @@ class UserOrderSerializer(serializers.ModelSerializer):
                                             message=validated_data.get('message'),
                                             merchant_id=validated_data['merchant_id'],
                                             total_price=order_total_price)
-        OrderItem.objects.bulk_create([
+        order_item_objects = OrderItem.objects.bulk_create([
             OrderItem(
                 order_id=order_object,
                 menu_id=data['menu_id'],
@@ -77,7 +77,7 @@ class UserOrderSerializer(serializers.ModelSerializer):
             )
             for data in validated_data['order_items']])
 
-        return order_object
+        return order_item_objects
 
     def update(self, instance, validated_data):
         if instance.status != 'PENDING':
