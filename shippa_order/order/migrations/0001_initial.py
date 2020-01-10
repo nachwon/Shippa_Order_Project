@@ -31,6 +31,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OrderItem',
             fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('menu_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='merchants.Menu')),
                 ('order_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='order.Order')),
                 ('quantity', models.PositiveIntegerField()),

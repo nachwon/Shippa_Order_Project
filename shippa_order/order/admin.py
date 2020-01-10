@@ -3,11 +3,12 @@ from order.models import Order, OrderItem
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'status', 'total_price')
+    list_display = ('user_id', 'status',)
     fieldsets = (
         ("user_info", {'fields': ('user_id',)}),
         ("order_status", {'fields': ('status',)}),
-        ("total_price", {'fields': ('total_price',)}),
+        ("request message", {'fields': ('message',)}),
+        ("merchant", {'fields': ('merchant_id',)})
     )
 
 

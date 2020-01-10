@@ -26,7 +26,7 @@ class Order(models.Model):
     last_updated_time = models.DateTimeField(auto_now=True)
     message = models.CharField(max_length=30, null=True)
     merchant_id = models.ForeignKey(Merchant, null=True, on_delete=models.PROTECT)
-    total_price = models.DecimalField(max_digits=12, decimal_places=2)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
 
 class OrderItem(models.Model):
