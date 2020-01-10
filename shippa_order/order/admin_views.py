@@ -24,7 +24,6 @@ class OrderListView(generics.ListAPIView):
         limit = request.query_params.get('limit', 10)
         offset = request.query_params.get('offset', 0)
         resp = self.get_queryset().order_by('created_at')[offset: limit]
-        serializer = self.get_serializer()
 
         results = [self.serializer_class(r).data for r in resp]
 
