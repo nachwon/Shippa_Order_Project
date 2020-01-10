@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import json
 import os
 
-env = os.environ.get('ENV_NAME', 'local').lower()
+env = os.environ.get('ENV_NAME', 'prod').lower()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
@@ -38,7 +38,7 @@ SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if env == 'prod' else True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com']
 
 # Application definition
 
@@ -172,3 +172,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
+
+# media files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
