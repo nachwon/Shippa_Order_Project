@@ -1,11 +1,13 @@
 from django.urls import path
 from order.views import OrderListCreateView, OrderRetrieveUpdateDestroyView
 
-from order.admin_views import UpdateOrderStatusView, OrderSalesReportView
+from order.admin_views import UpdateOrderStatusView, OrderSalesReportView, OrderDetailView, OrderListView
 
 urlpatterns = [
-    path('<int:order_id>/status/', UpdateOrderStatusView.as_view()),
-    path('sales_report/', OrderSalesReportView.as_view()),
     path('self/', OrderListCreateView.as_view()),
-    path('<int:id>/', OrderRetrieveUpdateDestroyView.as_view())
+    path('<int:id>/', OrderRetrieveUpdateDestroyView.as_view()),
+    path('admin/detail/<int:id>/', OrderDetailView.as_view()),
+    path('admin/order_list/', OrderListView.as_view()),
+    path('admin/<int:order_id>/status/', UpdateOrderStatusView.as_view()),
+    path('admin/sales_report/', OrderSalesReportView.as_view()),
 ]

@@ -19,6 +19,7 @@ class Order(models.Model):
         Canceled = 'CANCELED', _('Canceled')
         Failed = 'FAILED', _('Failed')
         Refunded = 'REFUNDED', _('Refunded')
+
     id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=10, choices=OrderStatus.choices, default=OrderStatus.Pending)
@@ -35,13 +36,12 @@ class OrderItem(models.Model):
         indexes = [
             models.Index(fields=['order_id'])
         ]
+
     order_id = models.ForeignKey(Order, on_delete=models.PROTECT)
     menu_id = models.ForeignKey(Menu, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-
-    menu_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    # value of total price should be menu's price * quantity
-    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    menu_price = models.DecimalField(max_digits=12, decimal_places=2)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2)
 
     def set_total_price(self, menu_price):
         return menu_price * self.quantity

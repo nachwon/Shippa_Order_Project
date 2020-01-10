@@ -18,8 +18,8 @@ class UserOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'status', 'user_id', 'created_at', 'last_updated_time', 'merchant_id', 'order_items', 'message']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'status', 'user_id', 'created_at', 'last_updated_time', 'merchant_id', 'order_items', 'message', 'total_price']
+        read_only_fields = ['id', 'created_at', 'total_price']
         extra_kwargs = {'user_id': {'write_only': True, 'required': True},
                         'merchant_id': {'write_only': True, 'required': True},
                         'order_items': {'write_only': True, 'required': True},
@@ -55,14 +55,29 @@ class UserOrderSerializer(serializers.ModelSerializer):
 
     @transaction.atomic()
     def create(self, validated_data):
+        if not validated_data['order_items'] and len(validated_data['order_items']) == 0:
+            raise Exception
+
+        order_total_price = 0
+        for data in validated_data['order_items']:
+            total_price = data['quantity'] * data['menu_price']
+            order_total_price += total_price
+
         order_object = Order.objects.create(user_id=validated_data['user_id'],
                                             message=validated_data.get('message'),
-                                            merchant_id=validated_data['merchant_id'])
-        OrderItem.objects.bulk_create([
-            OrderItem(order_id=order_object, menu_id=data['menu_id'], quantity=data['quantity'])
+                                            merchant_id=validated_data['merchant_id'],
+                                            total_price=order_total_price)
+        order_item_objects = OrderItem.objects.bulk_create([
+            OrderItem(
+                order_id=order_object,
+                menu_id=data['menu_id'],
+                quantity=data['quantity'],
+                menu_price=data['menu_price'],
+                total_price=data['quantity'] * data['menu_price']
+            )
             for data in validated_data['order_items']])
 
-        return order_object
+        return order_item_objects
 
     def update(self, instance, validated_data):
         if instance.status != 'PENDING':
@@ -79,7 +94,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['menu_id', 'quantity']
+        fields = ['menu_id', 'quantity', 'menu_price', 'total_price']
         depth = 2
 
     def update(self, instance, validated_data):
@@ -90,6 +105,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
             instance.quantity = validated_data['quantity']
         if validated_data.get('menu_id'):
             instance.menu_id = validated_data['menu_id']
+        if validated_data.get('menu_price'):
+            instance.menu_price = validated_data['menu_price']
+            instance.total_price = instance.menu_price * instance.quantity
+
         instance.save()
 
         return instance
