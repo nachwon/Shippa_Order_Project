@@ -5,6 +5,11 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from users.views import PointRetrieveUpdateView
 
+
+__all__ = [
+    "TestPoints"
+]
+
 User = get_user_model()
 
 
