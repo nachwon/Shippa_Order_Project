@@ -1,13 +1,20 @@
 from rest_framework import generics, permissions
 
-from users.models import PointsLog
-from users.serializers import PointsLogSerializers
+from users.models import PointsLog, User
+from users.serializers import PointsLogSerializers, PointSerializer
 from users import permissions as custom_permissions
 
 
 __all__ = [
+    "PointRetrieveUpdateView",
     "PointsLogListView"
 ]
+
+
+class PointRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = PointSerializer
+    queryset = User.objects.all()
+    permission_classes = [custom_permissions.IsSelfReadOnly | permissions.IsAdminUser]
 
 
 class PointsLogListView(generics.ListAPIView):

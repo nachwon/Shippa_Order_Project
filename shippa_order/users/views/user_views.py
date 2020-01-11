@@ -7,8 +7,7 @@ from users import permissions as custom_permissions
 
 __all__ = [
     "UserListView",
-    "UserRetrieveUpdateDestroyView",
-    "PointRetrieveUpdateView"
+    "UserRetrieveUpdateDestroyView"
 ]
 
 
@@ -22,9 +21,3 @@ class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [custom_permissions.IsSelf | permissions.IsAdminUser]
-
-
-class PointRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    serializer_class = PointSerializer
-    queryset = User.objects.all()
-    permission_classes = [custom_permissions.IsSelfReadOnly | permissions.IsAdminUser]
