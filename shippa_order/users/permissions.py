@@ -1,29 +1,26 @@
-from rest_framework.permissions import SAFE_METHODS, IsAdminUser
+from rest_framework import permissions
 
 __all__ = [
-    "IsAdminOrSelf",
-    "IsSelfReadOnlyOrAdmin"
+    "IsSelf",
+    "IsSelfReadOnly"
 ]
 
 
-class IsAdminOrSelf(IsAdminUser):
-    def has_permission(self, request, view):
+class IsSelf(permissions.IsAuthenticated):
+
+    def has_object_permission(self, request, view, obj):
         """
         Return `True` if permission is granted, `False` otherwise.
         """
-        is_admin = super().has_permission(request, view)
-        if is_admin or request.user == view.get_object():
-            return True
+        print(request.user == obj, request.user.is_staff)
+        return request.user == obj
 
 
-class IsSelfReadOnlyOrAdmin(IsAdminUser):
-    def has_permission(self, request, view):
+class IsSelfReadOnly(permissions.IsAuthenticated):
+
+    def has_object_permission(self, request, view, obj):
         """
         Return `True` if permission is granted, `False` otherwise.
         """
-        is_admin = super().has_permission(request, view)
-        if is_admin:
-            return True
-
-        if request.user == view.get_object() and request.method in SAFE_METHODS:
+        if request.user == obj and request.method in permissions.SAFE_METHODS:
             return True
