@@ -1,4 +1,7 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions
+
+from users.models import User
 
 __all__ = [
     "IsSelf",
@@ -7,20 +10,22 @@ __all__ = [
 
 
 class IsSelf(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        authenticated = super().has_permission(request, view)
+        if not authenticated:
+            return False
 
-    def has_object_permission(self, request, view, obj):
-        """
-        Return `True` if permission is granted, `False` otherwise.
-        """
-        print(request.user == obj, request.user.is_staff)
-        return request.user == obj
+        user_id = view.kwargs['pk']
+        user = get_object_or_404(User, pk=user_id)
+        return request.user == user and request.method in permissions.SAFE_METHODS
 
 
 class IsSelfReadOnly(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        authenticated = super().has_permission(request, view)
+        if not authenticated:
+            return False
 
-    def has_object_permission(self, request, view, obj):
-        """
-        Return `True` if permission is granted, `False` otherwise.
-        """
-        if request.user == obj and request.method in permissions.SAFE_METHODS:
-            return True
+        user_id = view.kwargs['pk']
+        user = get_object_or_404(User, pk=user_id)
+        return request.user == user and request.method in permissions.SAFE_METHODS
