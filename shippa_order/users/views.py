@@ -1,7 +1,7 @@
 import requests
 
 from django.forms import model_to_dict
-from rest_framework import generics, permissions, views
+from rest_framework import generics, permissions, views, status, exceptions
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -40,8 +40,12 @@ class GoogleLoginView(views.APIView):
         params = {
             'access_token': access_token
         }
-        user_info = requests.get(user_info_request_uri, headers=headers, params=params)
-        return user_info.json()
+        response = requests.get(user_info_request_uri, headers=headers, params=params)
+
+        if response.status_code != status.HTTP_200_OK:
+            raise exceptions.AuthenticationFailed("Invalid 'access_token'.")
+
+        return response.json()
 
     @staticmethod
     def get_tokens_for_user(user):
