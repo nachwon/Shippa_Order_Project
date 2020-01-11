@@ -1,14 +1,14 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 # Merchant API 1. 주문 -> merchant save.
-from order.models import Order
-from order.serializers import OrderSerializer
+from order.models import Order, OrderItem
+from order.serializers import OrderSerializer, OrderItemSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
         """
@@ -55,7 +55,7 @@ class OrderRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
     lookup_field = 'id'
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def retrieve(self, request, *args, **kwargs):
         order_object = self.get_object()
