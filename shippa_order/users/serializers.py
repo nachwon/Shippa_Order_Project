@@ -66,7 +66,7 @@ class PointSerializer(serializers.ModelSerializer):
 
         if not points_spent and not points_added:
             raise ValidationError(
-                {"error": "No data to update."}
+                {"error": "Either One of 'points_spent' or 'points_added' is required."}
             )
 
         if points_spent and points_added:
