@@ -1,18 +1,14 @@
-import uuid
-
-from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 # Merchant API 1. 주문 -> merchant save.
-from merchants.models import Merchant, Menu
-from order.models import Order
-from order.serializers import UserOrderSerializer
+from order.models import Order, OrderItem
+from order.serializers import OrderSerializer, OrderItemSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
-    serializer_class = UserOrderSerializer
+    serializer_class = OrderSerializer
     queryset = Order.objects.all()
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
         """
@@ -57,9 +53,9 @@ class OrderListCreateView(generics.ListCreateAPIView):
 
 class OrderRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
     lookup_field = 'id'
-    serializer_class = UserOrderSerializer
+    serializer_class = OrderSerializer
     queryset = Order.objects.all()
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def retrieve(self, request, *args, **kwargs):
         order_object = self.get_object()
@@ -68,7 +64,6 @@ class OrderRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
-        # status에 inprogress 도 필요하지 않을까 메뉴 제작중에 캔슬되면 짜증날 듯
         order_object = self.get_object()
         serializer = self.get_serializer(order_object, data={'status': 'CANCELED'}, partial=True)
         serializer.is_valid()

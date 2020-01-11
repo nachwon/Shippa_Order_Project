@@ -9,14 +9,14 @@ from rest_framework.response import Response
 
 from order import exceptions
 from order.models import Order
-from order.serializers import UserOrderSerializer
+from order.serializers import OrderSerializer
 
 
 # 기본적인 Merchant-API RU
 # 자기 가게의 주문 총 리스트 조회
 class OrderListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = UserOrderSerializer
+    serializer_class = OrderSerializer
 
     def get_queryset(self):
         merchant_id = self.request.query_params.get('merchant_id')
@@ -46,7 +46,7 @@ class OrderListView(generics.ListAPIView):
 # 특정 주문의 detail view 조회()
 class OrderDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = UserOrderSerializer
+    serializer_class = OrderSerializer
     lookup_field = 'id'
     queryset = Order.objects.all()
 
@@ -61,7 +61,7 @@ class OrderDetailView(generics.RetrieveAPIView):
 class UpdateOrderStatusView(generics.UpdateAPIView):
     permission_classes = [permissions.AllowAny]
     # used for validating and deserializing input, and for serializing output
-    serializer_class = UserOrderSerializer
+    serializer_class = OrderSerializer
     # queryset should be used for returning objects from this view
     queryset = Order.objects.all()
 
@@ -82,7 +82,7 @@ class UpdateOrderStatusView(generics.UpdateAPIView):
 # 모델 가져올때 체크사항 : Order의 status 상태가 결제완료 상태인 행만 가져올 것.
 class OrderSalesReportView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = UserOrderSerializer
+    serializer_class = OrderSerializer
     queryset = Order.objects.all()
 
     def get_queryset(self):

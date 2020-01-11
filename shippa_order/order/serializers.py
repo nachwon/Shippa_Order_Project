@@ -1,16 +1,14 @@
 import datetime
-
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from rest_framework import serializers
 
 from merchants.models import Merchant, Menu
 from merchants.serializers import MenuSerializer
-from order.exceptions import ObjectDoesNotExists
 from order.models import Order, OrderItem
+from users.serializers import PointSerializer
 
 
-class UserOrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     """
     Self Order List, Order Create
     """
@@ -18,20 +16,20 @@ class UserOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'status', 'user_id', 'created_at', 'last_updated_time', 'merchant_id', 'order_items', 'message', 'total_price']
+        fields = ['id', 'status', 'user', 'created_at', 'last_updated_time', 'merchant', 'order_items', 'message', 'total_price']
         read_only_fields = ['id', 'created_at', 'total_price']
-        extra_kwargs = {'user_id': {'write_only': True, 'required': True},
-                        'merchant_id': {'write_only': True, 'required': True},
+        extra_kwargs = {'user': {'write_only': True, 'required': True},
+                        'merchant': {'write_only': True, 'required': True},
                         'order_items': {'write_only': True, 'required': True},
                         'message': {'write_only': True}}
 
     def to_representation(self, instance):
-        if instance.merchant_id is None:
+        if instance.merchant is None:
             merchant_name = None
         else:
-            merchant_object = Merchant.objects.get(id=instance.merchant_id.id)
+            merchant_object = Merchant.objects.get(id=instance.merchant.id)
             merchant_name = merchant_object.name
-        order_item = OrderItem.objects.filter(order_id=instance.id)
+        order_item = OrderItem.objects.filter(order=instance.id)
         order_item_serializer = OrderItemSerializer(order_item, many=True)
 
         return {
@@ -39,74 +37,80 @@ class UserOrderSerializer(serializers.ModelSerializer):
             'status': instance.status,
             'create_at': datetime.datetime.strftime(instance.created_at, '%Y-%m-%d %H:%M:%S'),
             'last_updated_time': datetime.datetime.strftime(instance.last_updated_time, '%Y-%m-%d %H:%M:%S'),
-            'merchant_id': instance.merchant_id.id if instance.merchant_id else None,
+            'merchant_id': instance.merchant.id if instance.merchant else None,
             'merchant_name': merchant_name,
             'order_items': order_item_serializer.data
         }
 
-    def validate_order_items(self, value: list):
-        try:
-            validate_value = [{'menu_id': Menu.objects.get(id=data['menu_id']), 'quantity': data['quantity']}
-                              for data in value]
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExists('?')
-
-        return validate_value
-
     @transaction.atomic()
     def create(self, validated_data):
-        if not validated_data['order_items'] and len(validated_data['order_items']) == 0:
-            raise Exception
+        # Todo is_available_menus(menu_ids)
+        menu_ids = sorted([data['menu_id'] for data in validated_data['order_items']])
+        menu_objects = Menu.objects.filter(id__in=menu_ids)
+        # Todo get_price_by_menus(menu_ids)
+        # Todo calculate total price
 
-        order_total_price = 0
-        for data in validated_data['order_items']:
-            total_price = data['quantity'] * data['menu_price']
-            order_total_price += total_price
+        dummy_total_price = sum([menu.price * order_item['quantity']
+                                 for menu, order_item in zip(menu_objects, validated_data['order_items'])])
+        user = validated_data['user']
 
-        order_object = Order.objects.create(user_id=validated_data['user_id'],
+        order_object = Order.objects.create(user=validated_data['user'],
                                             message=validated_data.get('message'),
-                                            merchant_id=validated_data['merchant_id'],
-                                            total_price=order_total_price)
-        order_item_objects = OrderItem.objects.bulk_create([
+                                            merchant=validated_data['merchant'],
+                                            total_price=dummy_total_price)
+        OrderItem.objects.bulk_create([
             OrderItem(
-                order_id=order_object,
-                menu_id=data['menu_id'],
-                quantity=data['quantity'],
-                menu_price=data['menu_price'],
-                total_price=data['quantity'] * data['menu_price']
+                order=order_object,
+                menu=menu_object,
+                quantity=order_item['quantity'],
+                menu_price=menu_object.price,
+                total_price=order_item['quantity'] * menu_object.price
             )
-            for data in validated_data['order_items']])
+            for menu_object, order_item in zip(menu_objects, validated_data['order_items'])])
+        user_point_serializer = PointSerializer(user, data={
+            'points_spent': dummy_total_price
+        }, partial=True)
+        user_point_serializer.is_valid()
+        user_point_serializer.save()
 
-        return order_item_objects
+        return order_object
 
+    @transaction.atomic()
     def update(self, instance, validated_data):
-        if instance.status != 'PENDING':
-            # Todo Custom Exception
-            raise Exception
+        """
+         Order Cancel
+        """
+        if validated_data.get('status') and instance.status != 'PENDING':
+            raise
         instance.status = validated_data['status']
         instance.save()
 
-        # TODO: last_updated_time 필드 수정 필요.
+        points_serializer = PointSerializer(instance.user, data={'points_added': instance.total_price}, partial=True)
+        points_serializer.is_valid()
+        points_serializer.save()
 
         return instance
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    menu_id = MenuSerializer()
+    menu = MenuSerializer()
+    total_price = serializers.CharField(max_length=10)
 
     class Meta:
         model = OrderItem
-        fields = ['menu_id', 'quantity', 'menu_price', 'total_price']
+        fields = ['menu', 'quantity', 'menu_price', 'total_price']
+        read_only_fields = ['total_price', 'menu_price']
         depth = 2
 
     def update(self, instance, validated_data):
-        if Order.objects.get(id=instance.order_id).status != 'PENDING':
+        if Order.objects.get(id=instance.order).status != 'PENDING':
             # Todo write detail raise
             raise
+
         if validated_data.get('quantity'):
             instance.quantity = validated_data['quantity']
-        if validated_data.get('menu_id'):
-            instance.menu_id = validated_data['menu_id']
+        if validated_data.get('menu'):
+            instance.menu = validated_data['menu']
         if validated_data.get('menu_price'):
             instance.menu_price = validated_data['menu_price']
             instance.total_price = instance.menu_price * instance.quantity
