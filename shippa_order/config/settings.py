@@ -38,7 +38,7 @@ SECRET_KEY = secrets['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if env == 'prod' else True
 
-ALLOWED_HOSTS = ['ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
