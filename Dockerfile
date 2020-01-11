@@ -33,8 +33,8 @@ RUN         mkdir -p /var/log/uwsgi/app
 
 # manage.py
 WORKDIR     /srv/app/soundhub
-RUN         /root/.pyenv/versions/app/bin/python /srv/app/soundhub/manage.py collectstatic --noinput
-RUN         /root/.pyenv/versions/app/bin/python /srv/app/soundhub/manage.py migrate --noinput
+RUN         /root/.pyenv/versions/app/bin/python /srv/app/shippa_order/manage.py collectstatic --noinput
+RUN         /root/.pyenv/versions/app/bin/python /srv/app/shippa_order/manage.py migrate --noinput
 
 # supervisor
 RUN         cp /srv/app/.config/supervisor/* /etc/supervisor/conf.d/
