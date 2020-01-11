@@ -7,9 +7,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User
 from users.serializers import UserSerializer, PointSerializer, CustomTokenObtainPairSerializer
+from users import permissions as custom_permissions
 
 
-class UserListCreateView(generics.ListCreateAPIView):
+class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [permissions.IsAdminUser]
@@ -18,13 +19,13 @@ class UserListCreateView(generics.ListCreateAPIView):
 class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [custom_permissions.IsAdminOrSelf]
 
 
 class PointRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PointSerializer
     queryset = User.objects.all()
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [custom_permissions.IsSelfReadOnlyOrAdmin]
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
