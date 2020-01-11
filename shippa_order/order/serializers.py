@@ -86,6 +86,8 @@ class UserOrderSerializer(serializers.ModelSerializer):
         instance.status = validated_data['status']
         instance.save()
 
+        # TODO: last_updated_time 필드 수정 필요.
+
         return instance
 
 
