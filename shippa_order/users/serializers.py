@@ -106,6 +106,15 @@ class PointSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PointsLogSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = PointsLog
+        fields = [
+            "points_spent", "points_added", "created_at"
+        ]
+
+
 # noinspection PyAbstractClass
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
