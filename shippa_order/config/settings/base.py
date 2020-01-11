@@ -9,34 +9,17 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-import json
 import os
-
-env = os.environ.get('ENV_NAME', 'prod').lower()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_DIR = os.path.join(os.path.join(os.path.dirname(BASE_DIR), '.secrets'), f'{env}_secrets.json')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+print(BASE_DIR)
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
-
-# Secret file
-if not os.path.exists(SECRET_DIR):
-    raise FileNotFoundError(f"Secret data file not found. Please provide '.secrets/{env}_secrets.json' file.")
-else:
-    with open(SECRET_DIR, 'r') as f:
-        secrets = json.loads(f.read())
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secrets['DJANGO_SECRET_KEY']
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False if env == 'prod' else True
 
 ALLOWED_HOSTS = ['ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com', 'localhost', '127.0.0.1']
 
@@ -91,49 +74,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-connection_info = secrets['DB_CONNECTION_INFO']
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': connection_info['NAME'],
-        'USER': connection_info['USER'],
-        'PASSWORD': connection_info['PASSWORD'],
-        'HOST': connection_info['HOST'],
-        'PORT': connection_info['PORT'],
-    }
-}
-
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
-
-# Google OAuth
-google_oauth = secrets['GOOGLE_OAUTH']
-GOOGLE_CLIENT_ID = google_oauth['CLIENT_ID']
-GOOGLE_CLIENT_SECRET = google_oauth['CLIENT_SECRET']
-
-
-# CORS https://www.techiediaries.com/django-cors/
-CORS_ORIGIN_ALLOW_ALL = True
-
-# CORS_ORIGIN_ALLOW_ALL = False
-# CORS_ORIGIN_WHITELIST = (
-#     'http//:localhost:8000',
-# )
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
