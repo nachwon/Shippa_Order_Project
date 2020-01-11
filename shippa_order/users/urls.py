@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.UserListView.as_view()),
     path('<int:pk>/', views.UserRetrieveUpdateDestroyView.as_view()),
     path('<int:pk>/points/', views.PointRetrieveUpdateView.as_view()),
+    path('<int:pk>/points/logs/', views.PointsLogListView.as_view()),
     path('token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('login/google/', views.GoogleLoginView.as_view())

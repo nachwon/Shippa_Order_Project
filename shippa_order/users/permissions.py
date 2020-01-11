@@ -1,29 +1,31 @@
-from rest_framework.permissions import SAFE_METHODS, IsAdminUser
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions
+
+from users.models import User
 
 __all__ = [
-    "IsAdminOrSelf",
-    "IsSelfReadOnlyOrAdmin"
+    "IsSelf",
+    "IsSelfReadOnly"
 ]
 
 
-class IsAdminOrSelf(IsAdminUser):
+class IsSelf(permissions.IsAuthenticated):
     def has_permission(self, request, view):
-        """
-        Return `True` if permission is granted, `False` otherwise.
-        """
-        is_admin = super().has_permission(request, view)
-        if is_admin or request.user == view.get_object():
-            return True
+        authenticated = super().has_permission(request, view)
+        if not authenticated:
+            return False
+
+        user_id = view.kwargs['pk']
+        user = get_object_or_404(User, pk=user_id)
+        return request.user == user and request.method in permissions.SAFE_METHODS
 
 
-class IsSelfReadOnlyOrAdmin(IsAdminUser):
+class IsSelfReadOnly(permissions.IsAuthenticated):
     def has_permission(self, request, view):
-        """
-        Return `True` if permission is granted, `False` otherwise.
-        """
-        is_admin = super().has_permission(request, view)
-        if is_admin:
-            return True
+        authenticated = super().has_permission(request, view)
+        if not authenticated:
+            return False
 
-        if request.user == view.get_object() and request.method in SAFE_METHODS:
-            return True
+        user_id = view.kwargs['pk']
+        user = get_object_or_404(User, pk=user_id)
+        return request.user == user and request.method in permissions.SAFE_METHODS
