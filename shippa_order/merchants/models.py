@@ -11,11 +11,11 @@ class Merchant(models.Model):
     # operating time
     forced_closing = models.BooleanField(default=True)
 
-    # 1000000: SUN
-    # 0100000: MON
+    # 0000001: SUN
+    # 0000010: MON
     # 0 ~ 127(every day)
-    # ex> 1010101 AND 0000001(SAT) => 0000001 open!
-    # ex> 1010101 AND 0000010(FRI) => 0000000 close!
+    # ex> 1010101 AND 1000000(SAT) => 1000000 open!
+    # ex> 1010101 AND 0100000(FRI) => 0000000 close!
     business_days = models.PositiveSmallIntegerField(default=0)
     open_time = models.TimeField(default='00:00:00')
     close_time = models.TimeField(default='00:00:00')
@@ -42,7 +42,7 @@ class Menu(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=128)
     image = models.CharField(max_length=128, null=True)
-    price = models.DecimalField(max_digits=12, decimal_places=2)
+    price = models.PositiveSmallIntegerField()
     currency = models.CharField(max_length=3)
     quantity = models.SmallIntegerField(default=0)
 

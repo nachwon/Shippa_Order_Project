@@ -9,13 +9,13 @@ class UserLevelCodes(IntEnum):
 
 
 class BinaryOfDays(IntEnum):
-    SUN = int('1000000', 2)
-    MON = int('0100000', 2)
-    TUE = int('0010000', 2)
+    SUN = int('0000001', 2)
+    MON = int('0000010', 2)
+    TUE = int('0000100', 2)
     WED = int('0001000', 2)
-    THU = int('0000100', 2)
-    FRI = int('0000010', 2)
-    SAT = int('0000001', 2)
+    THU = int('0010000', 2)
+    FRI = int('0100000', 2)
+    SAT = int('1000000', 2)
 
 
 def _available_days(business_day):
