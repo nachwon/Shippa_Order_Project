@@ -1,0 +1,42 @@
+FROM python:3.7.1
+MAINTAINER nachwon@gmail.com
+
+# APT Update
+RUN         apt-get -y update
+RUN         apt-get -y dist-upgrade
+
+# Pyenv
+RUN         apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev
+
+RUN         curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+ENV         PATH /root/.pyenv/bin:$PATH
+RUN         pyenv install 3.7.1
+
+# zsh
+RUN         apt-get install -y zsh
+RUN         wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
+RUN         chsh -s /usr/bin/zsh
+
+# pyenv settings
+RUN         echo 'export PATH="/root/.pyenv/bin:$PATH"' >> ~/.zshrc
+RUN         echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+RUN         echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
+
+# pyenv virtualenv
+RUN         pyenv virtualenv 3.7.1 app
+
+# Python
+RUN         pip install --upgrade pip
+
+
+
+# supervisor install
+RUN         apt-get -y install supervisor
+
+# uWGSI install
+RUN         /root/.pyenv/versions/app/bin/pip install uwsgi
+
+# Nginx install
+RUN         apt-get -y install nginx
