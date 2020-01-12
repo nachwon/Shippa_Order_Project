@@ -20,7 +20,7 @@ RUN         mkdir -p /var/log/uwsgi/app
 
 # manage.py
 RUN         /root/.pyenv/versions/app/bin/python /srv/app/shippa_order/manage.py collectstatic --noinput
-#RUN         /root/.pyenv/versions/app/bin/python /srv/app/shippa_order/manage.py migrate --noinput
+RUN         /root/.pyenv/versions/app/bin/python /srv/app/shippa_order/manage.py migrate --noinput
 
 # supervisor
 RUN         cp /srv/app/.deploy_settings/supervisor/* /etc/supervisor/conf.d/
