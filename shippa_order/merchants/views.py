@@ -6,14 +6,26 @@ from merchants.serializers import MerchantSerializer, MenuSerializer
 
 
 class MerchantListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAdminUser]
     serializer_class = MerchantSerializer
     queryset = Merchant.objects.all()
 
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
 
 class MerchantRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAdminUser]
     serializer_class = MerchantSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -21,8 +33,14 @@ class MerchantRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
 
 class MenuListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAdminUser]
     serializer_class = MenuSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         merchant_id = self.kwargs['merchant_id']
@@ -33,8 +51,14 @@ class MenuListCreateView(generics.ListCreateAPIView):
 
 
 class MenuRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAdminUser]
     serializer_class = MenuSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         merchant_id = self.kwargs['merchant_id']
