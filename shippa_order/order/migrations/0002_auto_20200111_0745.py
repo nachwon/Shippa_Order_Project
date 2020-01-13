@@ -10,14 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveIndex(
-            model_name='order',
-            name='order_order_user_id_e527b6_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='orderitem',
-            name='order_order_order_i_2ede3a_idx',
-        ),
         migrations.RenameField(
             model_name='order',
             old_name='merchant_id',
