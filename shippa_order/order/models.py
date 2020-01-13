@@ -41,8 +41,8 @@ class OrderItem(models.Model):
     menu = models.ForeignKey(Menu, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     menu_price = models.PositiveIntegerField()
-    discounted_price = models.PositiveIntegerField()
-    discount_ratio = models.FloatField()
+    discounted_price = models.PositiveIntegerField(default=0)
+    discount_ratio = models.FloatField(default=0.0)
     total_price = models.PositiveIntegerField()
 
     def set_total_price(self, menu_price):
