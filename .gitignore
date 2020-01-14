@@ -326,3 +326,11 @@ $RECYCLE.BIN/
 prod_secrets.json
 local_secrets.json
 # End of https://www.gitignore.io/api/linux,macos,python,django,windows,pycharm+all
+
+# static
+static/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
