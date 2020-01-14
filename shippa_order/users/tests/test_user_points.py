@@ -5,6 +5,11 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from users.views import PointRetrieveUpdateView
 
+
+__all__ = [
+    "TestPoints"
+]
+
 User = get_user_model()
 
 
@@ -39,7 +44,7 @@ class TestPoints(TestCase):
         user = User.objects.get(pk=3)
         request = self.factory.get('api/v1/users/1/points/')
         force_authenticate(request, user)
-        response = self.test_view(request, pk=user.pk)
+        response = self.test_view(request, pk=1)
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
     def test_add_points(self):

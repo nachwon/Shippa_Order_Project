@@ -34,5 +34,5 @@ jobs:
     - name: Test Django
       run: |
         cd shippa_order
-        export ENV_NAME=test
+        export DJANGO_SETTINGS_MODULE=config.settings.test
         python manage.py test
