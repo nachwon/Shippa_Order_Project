@@ -2,8 +2,9 @@ import datetime
 from django.db import transaction
 from rest_framework import serializers
 
-from merchants.models import Merchant, Menu
+from merchants.models import Merchant
 from merchants.serializers import MenuSerializer
+from merchants.utils import MenuManager
 from order.models import Order, OrderItem
 from users.serializers import PointSerializer
 
@@ -44,31 +45,32 @@ class OrderSerializer(serializers.ModelSerializer):
 
     @transaction.atomic()
     def create(self, validated_data):
-        # Todo is_available_menus(menu_ids)
         menu_ids = sorted([data['menu_id'] for data in validated_data['order_items']])
-        menu_objects = Menu.objects.filter(id__in=menu_ids)
-        # Todo get_price_by_menus(menu_ids)
-        # Todo calculate total price
+        menu_manager = MenuManager(merchant_id=validated_data['merchant'].id, menu_ids=menu_ids)
+        menu_manager.check_if_menus_order_is_available()
+        menu_objects = menu_manager.get_menus_for_order()
+        total_price = sum([menu_objects[order_item['menu_id']].price * order_item['quantity'] for order_item in validated_data['order_items']])
 
-        dummy_total_price = sum([menu.price * order_item['quantity']
-                                 for menu, order_item in zip(menu_objects, validated_data['order_items'])])
         user = validated_data['user']
 
         order_object = Order.objects.create(user=validated_data['user'],
                                             message=validated_data.get('message'),
                                             merchant=validated_data['merchant'],
-                                            total_price=dummy_total_price)
+                                            total_price=total_price)
+        menus = {menu.id: menu for menu in menu_manager.menus}
         OrderItem.objects.bulk_create([
             OrderItem(
                 order=order_object,
-                menu=menu_object,
+                menu=menus[order_item['menu_id']],
                 quantity=order_item['quantity'],
-                menu_price=menu_object.price,
-                total_price=order_item['quantity'] * menu_object.price
-            )
-            for menu_object, order_item in zip(menu_objects, validated_data['order_items'])])
+                menu_price=menu_objects[order_item['menu_id']].price,
+                total_price=order_item['quantity'] * menu_objects[order_item['menu_id']].price,
+                discounted_price=menu_objects[order_item['menu_id']].discounted_price,
+                discount_ratio=menu_objects[order_item['menu_id']].discount_ratio
+            ) for order_item in validated_data['order_items']])
+
         user_point_serializer = PointSerializer(user, data={
-            'points_spent': dummy_total_price
+            'points_spent': total_price
         }, partial=True)
         user_point_serializer.is_valid()
         user_point_serializer.save()
