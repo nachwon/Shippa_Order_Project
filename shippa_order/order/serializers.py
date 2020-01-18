@@ -49,7 +49,8 @@ class OrderSerializer(serializers.ModelSerializer):
         menu_manager = MenuManager(merchant_id=validated_data['merchant'].id, menu_ids=menu_ids)
         menu_manager.check_if_menus_order_is_available()
         menu_objects = menu_manager.get_menus_for_order()
-        total_price = sum([menu_objects[order_item['menu_id']].price * order_item['quantity'] for order_item in validated_data['order_items']])
+        total_price = sum([menu_objects[order_item['menu_id']].discounted_price * order_item['quantity']
+                           for order_item in validated_data['order_items']])
 
         user = validated_data['user']
 
@@ -64,7 +65,7 @@ class OrderSerializer(serializers.ModelSerializer):
                 menu=menus[order_item['menu_id']],
                 quantity=order_item['quantity'],
                 menu_price=menu_objects[order_item['menu_id']].price,
-                total_price=order_item['quantity'] * menu_objects[order_item['menu_id']].price,
+                total_price=order_item['quantity'] * menu_objects[order_item['menu_id']].discounted_price,
                 discounted_price=menu_objects[order_item['menu_id']].discounted_price,
                 discount_ratio=menu_objects[order_item['menu_id']].discount_ratio
             ) for order_item in validated_data['order_items']])
