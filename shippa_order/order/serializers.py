@@ -2,8 +2,10 @@ import datetime
 from django.db import transaction
 from rest_framework import serializers
 
-from merchants.models import Merchant, Menu
+from common.exceptions import OrderCanCelFailedException
+from merchants.models import Merchant
 from merchants.serializers import MenuSerializer
+from merchants.utils import MenuManager
 from order.models import Order, OrderItem
 from users.serializers import PointSerializer
 
@@ -24,51 +26,57 @@ class OrderSerializer(serializers.ModelSerializer):
                         'message': {'write_only': True}}
 
     def to_representation(self, instance):
+        presentation_type = self.context.get('presentation')
         if instance.merchant is None:
             merchant_name = None
         else:
             merchant_object = Merchant.objects.get(id=instance.merchant.id)
             merchant_name = merchant_object.name
-        order_item = OrderItem.objects.filter(order=instance.id)
-        order_item_serializer = OrderItemSerializer(order_item, many=True)
 
-        return {
-            'id': instance.id,
-            'status': instance.status,
-            'create_at': datetime.datetime.strftime(instance.created_at, '%Y-%m-%d %H:%M:%S'),
-            'last_updated_time': datetime.datetime.strftime(instance.last_updated_time, '%Y-%m-%d %H:%M:%S'),
-            'merchant_id': instance.merchant.id if instance.merchant else None,
-            'merchant_name': merchant_name,
-            'order_items': order_item_serializer.data
-        }
+        return_data = {
+                'id': instance.id,
+                'status': instance.status,
+                'create_at': datetime.datetime.strftime(instance.created_at, '%Y-%m-%d %H:%M:%S'),
+                'last_updated_time': datetime.datetime.strftime(instance.last_updated_time, '%Y-%m-%d %H:%M:%S'),
+                'merchant_id': instance.merchant.id if instance.merchant else None,
+                'merchant_name': merchant_name,
+                'total_price': instance.total_price
+            }
+        if presentation_type == 'retrieve':
+            order_item = OrderItem.objects.filter(order=instance.id)
+            order_item_serializer = OrderItemSerializer(order_item, many=True)
+            return_data['order_items'] = order_item_serializer.data
+        return return_data
 
     @transaction.atomic()
     def create(self, validated_data):
-        # Todo is_available_menus(menu_ids)
         menu_ids = sorted([data['menu_id'] for data in validated_data['order_items']])
-        menu_objects = Menu.objects.filter(id__in=menu_ids)
-        # Todo get_price_by_menus(menu_ids)
-        # Todo calculate total price
+        menu_manager = MenuManager(merchant_id=validated_data['merchant'].id, menu_ids=menu_ids)
+        menu_manager.check_if_menus_order_is_available()
+        menu_objects = menu_manager.get_menus_for_order()
+        total_price = sum([menu_objects[order_item['menu_id']].discounted_price * order_item['quantity']
+                           for order_item in validated_data['order_items']])
 
-        dummy_total_price = sum([menu.price * order_item['quantity']
-                                 for menu, order_item in zip(menu_objects, validated_data['order_items'])])
         user = validated_data['user']
 
         order_object = Order.objects.create(user=validated_data['user'],
                                             message=validated_data.get('message'),
                                             merchant=validated_data['merchant'],
-                                            total_price=dummy_total_price)
+                                            total_price=total_price)
+        menus = {menu.id: menu for menu in menu_manager.menus}
         OrderItem.objects.bulk_create([
             OrderItem(
                 order=order_object,
-                menu=menu_object,
+                menu=menus[order_item['menu_id']],
                 quantity=order_item['quantity'],
-                menu_price=menu_object.price,
-                total_price=order_item['quantity'] * menu_object.price
-            )
-            for menu_object, order_item in zip(menu_objects, validated_data['order_items'])])
+                menu_price=menu_objects[order_item['menu_id']].price,
+                total_price=order_item['quantity'] * menu_objects[order_item['menu_id']].discounted_price,
+                discounted_price=menu_objects[order_item['menu_id']].discounted_price,
+                discount_ratio=menu_objects[order_item['menu_id']].discount_ratio
+            ) for order_item in validated_data['order_items']])
+
         user_point_serializer = PointSerializer(user, data={
-            'points_spent': dummy_total_price
+            'points_spent': total_price
         }, partial=True)
         user_point_serializer.is_valid()
         user_point_serializer.save()
@@ -81,7 +89,7 @@ class OrderSerializer(serializers.ModelSerializer):
          Order Cancel
         """
         if validated_data.get('status') and instance.status != 'PENDING':
-            raise
+            raise OrderCanCelFailedException(detail='Order cancellation is only possible when the status is pending.')
         instance.status = validated_data['status']
         instance.save()
 
@@ -94,7 +102,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     menu = MenuSerializer()
-    total_price = serializers.CharField(max_length=10)
 
     class Meta:
         model = OrderItem
@@ -103,6 +110,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         depth = 2
 
     def update(self, instance, validated_data):
+        # Supported Not Yet
         if Order.objects.get(id=instance.order).status != 'PENDING':
             # Todo write detail raise
             raise
@@ -118,4 +126,16 @@ class OrderItemSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+    def to_representation(self, instance):
+
+        return {
+            'order_id': instance.id,
+            'menu_id': instance.menu.id,
+            'quantity': instance.quantity,
+            'menu_price': instance.menu_price,
+            'total_price': instance.total_price,
+            'discounted_price': instance.discounted_price,
+            'discount_ratio': instance.discount_ratio
+        }
 

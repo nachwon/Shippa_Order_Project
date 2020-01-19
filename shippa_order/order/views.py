@@ -1,8 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-# Merchant API 1. 주문 -> merchant save.
-from order.models import Order, OrderItem
-from order.serializers import OrderSerializer, OrderItemSerializer
+from order.models import Order
+from order.serializers import OrderSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
@@ -19,7 +18,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
         limit = request.query_params.get('limit', 10)
         resp = self.get_queryset().filter(user_id=user_id).order_by('created_at')[offset: limit]
         serializer = self.get_serializer_class()
-        results = [serializer(r).data for r in resp]
+        results = [serializer(r, context={'presentation': 'list'}).data for r in resp]
 
         return Response({
             'pagination': {
@@ -48,7 +47,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
         if not is_valid:
             return Response(data={'reason': serializer.errors})
         order = serializer.save()
-        return Response(data={'order_id': order.id})
+        return Response(data={'order_id': order.id}, status=status.HTTP_201_CREATED)
 
 
 class OrderRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
@@ -57,11 +56,18 @@ class OrderRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
     queryset = Order.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
 
+    def check_object_permissions(self, request, obj):
+        if obj.user != request.user:
+            self.permission_denied(
+                request, message='Permission Denied'
+            )
+
     def retrieve(self, request, *args, **kwargs):
         order_object = self.get_object()
-        serializer = self.get_serializer(order_object)
+        serializer = self.get_serializer_class()
+        serializer_data = serializer(order_object, context={'presentation': 'retrieve'}).data
 
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(data=serializer_data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         order_object = self.get_object()

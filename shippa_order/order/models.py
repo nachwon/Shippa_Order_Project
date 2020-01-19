@@ -28,6 +28,7 @@ class Order(models.Model):
     last_updated_time = models.DateTimeField(auto_now=True)
     message = models.CharField(max_length=30, null=True)
     total_price = models.PositiveIntegerField()
+    objects = models.Manager()
 
 
 class OrderItem(models.Model):
@@ -44,6 +45,7 @@ class OrderItem(models.Model):
     discounted_price = models.PositiveIntegerField(default=0)
     discount_ratio = models.FloatField(default=0.0)
     total_price = models.PositiveIntegerField()
+    objects = models.Manager()
 
     def set_total_price(self, menu_price):
         return menu_price * self.quantity
