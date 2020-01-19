@@ -32,7 +32,14 @@ class MenuIsUnavailable(APIException):
 # Orders
 class OrdersException(APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_detail = ErrorCodes.ORDER.value
+    default_detail = 'Order Service is Unavailable'
+    default_code = ErrorCodes.ORDER.value
+
+
+class OrderCanCelFailedException(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'Order cancellation failed'
+    default_code = ErrorCodes.ORDER.value
 
 
 # Notifications
