@@ -2,6 +2,7 @@ import datetime
 from django.db import transaction
 from rest_framework import serializers
 
+from common.exceptions import OrderCanCelFailedException
 from merchants.models import Merchant
 from merchants.serializers import MenuSerializer
 from merchants.utils import MenuManager
@@ -88,7 +89,7 @@ class OrderSerializer(serializers.ModelSerializer):
          Order Cancel
         """
         if validated_data.get('status') and instance.status != 'PENDING':
-            raise
+            raise OrderCanCelFailedException(detail='Order cancellation is only possible when the status is pending.')
         instance.status = validated_data['status']
         instance.save()
 
@@ -109,6 +110,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         depth = 2
 
     def update(self, instance, validated_data):
+        # Supported Not Yet
         if Order.objects.get(id=instance.order).status != 'PENDING':
             # Todo write detail raise
             raise
