@@ -1,8 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-# Merchant API 1. 주문 -> merchant save.
-from order.models import Order, OrderItem
-from order.serializers import OrderSerializer, OrderItemSerializer
+from order.models import Order
+from order.serializers import OrderSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
@@ -56,6 +55,12 @@ class OrderRetrieveUpdateDestroyView(generics.RetrieveDestroyAPIView):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+
+    def check_object_permissions(self, request, obj):
+        if obj.user != request.user:
+            self.permission_denied(
+                request, message='Permission Denied'
+            )
 
     def retrieve(self, request, *args, **kwargs):
         order_object = self.get_object()
