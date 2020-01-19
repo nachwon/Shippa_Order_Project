@@ -47,6 +47,3 @@ class OrderItem(models.Model):
     total_price = models.PositiveIntegerField()
     objects = models.Manager()
 
-    def set_total_price(self, menu_price):
-        return menu_price * self.quantity
-
