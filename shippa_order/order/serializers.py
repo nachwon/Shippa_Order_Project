@@ -25,23 +25,27 @@ class OrderSerializer(serializers.ModelSerializer):
                         'message': {'write_only': True}}
 
     def to_representation(self, instance):
+        presentation_type = self.context.get('presentation')
         if instance.merchant is None:
             merchant_name = None
         else:
             merchant_object = Merchant.objects.get(id=instance.merchant.id)
             merchant_name = merchant_object.name
-        order_item = OrderItem.objects.filter(order=instance.id)
-        order_item_serializer = OrderItemSerializer(order_item, many=True)
 
-        return {
-            'id': instance.id,
-            'status': instance.status,
-            'create_at': datetime.datetime.strftime(instance.created_at, '%Y-%m-%d %H:%M:%S'),
-            'last_updated_time': datetime.datetime.strftime(instance.last_updated_time, '%Y-%m-%d %H:%M:%S'),
-            'merchant_id': instance.merchant.id if instance.merchant else None,
-            'merchant_name': merchant_name,
-            'order_items': order_item_serializer.data
-        }
+        return_data = {
+                'id': instance.id,
+                'status': instance.status,
+                'create_at': datetime.datetime.strftime(instance.created_at, '%Y-%m-%d %H:%M:%S'),
+                'last_updated_time': datetime.datetime.strftime(instance.last_updated_time, '%Y-%m-%d %H:%M:%S'),
+                'merchant_id': instance.merchant.id if instance.merchant else None,
+                'merchant_name': merchant_name,
+                'total_price': instance.total_price
+            }
+        if presentation_type == 'retrieve':
+            order_item = OrderItem.objects.filter(order=instance.id)
+            order_item_serializer = OrderItemSerializer(order_item, many=True)
+            return_data['order_items'] = order_item_serializer.data
+        return return_data
 
     @transaction.atomic()
     def create(self, validated_data):
@@ -97,7 +101,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     menu = MenuSerializer()
-    total_price = serializers.CharField(max_length=10)
 
     class Meta:
         model = OrderItem
@@ -121,4 +124,16 @@ class OrderItemSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+    def to_representation(self, instance):
+
+        return {
+            'order_id': instance.id,
+            'menu_id': instance.menu.id,
+            'quantity': instance.quantity,
+            'menu_price': instance.menu_price,
+            'total_price': instance.total_price,
+            'discounted_price': instance.discounted_price,
+            'discount_ratio': instance.discount_ratio
+        }
 
