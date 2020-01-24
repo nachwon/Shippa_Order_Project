@@ -18,9 +18,9 @@ class UserAdmin(BaseUserAdmin):
 
 
 class PointsLogAdmin(admin.ModelAdmin):
-    list_display = ("user", "points_spent", "points_added", "created_at")
+    list_display = ("user", "points_spent", "points_added", "points", "created_at")
     fieldsets = (
-        (None, {"fields": ('user', "points_spent", "points_added", "created_at")}),
+        (None, {"fields": ('user', "points_spent", "points_added", "points", "created_at")}),
     )
     list_filter = ("user", "created_at")
     readonly_fields = ("user", "points_spent", "points_added", "created_at")
