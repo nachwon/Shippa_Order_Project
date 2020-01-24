@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
+from users.exceptions import BadRequest
 from users.models import User
 from users.serializers import CustomTokenObtainPairSerializer
 
@@ -33,6 +34,9 @@ class GoogleLoginView(views.APIView):
 
     def post(self, request, *args, **kwargs):
         token = request.data.get('id_token')
+        if not token:
+            raise BadRequest(detail="'id_token' is required.")
+
         user_info = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
 
         email = user_info['email']
