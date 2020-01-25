@@ -3,10 +3,11 @@ from rest_framework.response import Response
 
 from order.models import Order
 from order.serializers import OrderSerializer
+from users import permissions as user_permissions
 
 
 class MerchantOrderListCreateView(generics.ListCreateAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = OrderSerializer
 
     def get_queryset(self):
@@ -29,7 +30,7 @@ class MerchantOrderListCreateView(generics.ListCreateAPIView):
 
 
 class MerchantOrderRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = OrderSerializer
     lookup_url_kwarg = 'order_id'
 
@@ -40,7 +41,7 @@ class MerchantOrderRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIVie
 
 
 class UserOrderListView(generics.ListAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [user_permissions.IsSelf]
     serializer_class = OrderSerializer
 
     def get_queryset(self):
