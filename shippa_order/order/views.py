@@ -6,8 +6,17 @@ from order.serializers import OrderSerializer
 from users import permissions as user_permissions
 
 
-class MerchantOrderListCreateView(generics.ListCreateAPIView):
+class MerchantOrderListView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        merchant_id = self.kwargs.get('merchant_id')
+        return Order.objects.filter(merchant_id=merchant_id)
+
+
+class MerchantOrderCreateView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderSerializer
 
     def get_queryset(self):
@@ -18,6 +27,7 @@ class MerchantOrderListCreateView(generics.ListCreateAPIView):
         serializer = self.get_serializer_class()
         data = {
             "merchant": self.kwargs.get('merchant_id'),
+            "user": self.request.user.pk,
             **request.data
         }
         serialized_order = serializer(data=data, context=self.kwargs)

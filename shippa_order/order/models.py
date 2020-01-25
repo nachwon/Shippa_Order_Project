@@ -34,6 +34,14 @@ class Order(models.Model):
     def __str__(self):
         return f"{self.merchant.name} - {self.user.username}:{self.status}"
 
+    def validate_total_price(self):
+        """
+        Check if the user has enough points to place this order.
+        :return:
+        """
+        if self.user.points < self.total_price:
+            raise ValidationError(f"{self.user.username} does not have enough points to place this order.")
+
     @staticmethod
     def calculate_total_price(order_items):
         """
@@ -48,14 +56,6 @@ class Order(models.Model):
             elif isinstance(item, OrderedDict):
                 total_price += item.get('menu').price * item.get('quantity')
         return total_price
-
-    def validate_total_price(self):
-        """
-        Check if the user has enough points to place this order.
-        :return:
-        """
-        if self.user.points < self.total_price:
-            raise ValidationError(f"{self.user.username} does not have enough points to place this order.")
 
     def save_total_price(self):
         """
