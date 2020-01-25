@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 
 class Merchant(models.Model):
     # base
@@ -7,6 +9,9 @@ class Merchant(models.Model):
     name = models.CharField(max_length=128)
     email = models.EmailField(max_length=128, unique=True)
     phone = models.CharField(max_length=24, unique=True)
+
+    # admin user
+    admin_users = models.ManyToManyField(User)
 
     # operating time
     forced_closing = models.BooleanField(default=True)
