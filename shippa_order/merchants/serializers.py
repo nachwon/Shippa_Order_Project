@@ -64,7 +64,7 @@ class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
         fields = [
-            'id', 'name', 'image', 'price', 'currency', 'quantity', 'merchant_id', 'closed',
+            'id', 'name', 'image', 'original_price', 'discount', 'price', 'merchant_id', 'out_of_stock',
             'created_at',
         ]
         read_only_fields = [

@@ -36,28 +36,36 @@ class Merchant(models.Model):
             models.Index(fields=['phone', ]),
         ]
 
+    def __str__(self):
+        return self.name
+
 
 class Menu(models.Model):
     # base
     id = models.AutoField(primary_key=True, editable=False)
+    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     image = models.CharField(max_length=128, null=True)
-    price = models.PositiveSmallIntegerField()
-    currency = models.CharField(max_length=3)
-    quantity = models.SmallIntegerField(default=0)
-
-    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE)
+    original_price = models.PositiveSmallIntegerField(default=0)
+    discount = models.PositiveSmallIntegerField(default=0)
 
     # option
-    closed = models.BooleanField(default=True)
+    out_of_stock = models.BooleanField(default=False)
 
     # date
     created_at = models.DateTimeField(auto_now_add=True)
-    last_updated_time = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         order_with_respect_to = 'merchant'
         indexes = [
             models.Index(fields=['merchant_id', ]),
-            models.Index(fields=['merchant_id', 'closed', ]),
+            models.Index(fields=['merchant_id', 'out_of_stock', ]),
         ]
+
+    def __str__(self):
+        return f"{self.merchant}: {self.name} - {self.price}"
+    
+    @property
+    def price(self):
+        return self.original_price - self.discount
