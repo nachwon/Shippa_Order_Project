@@ -21,7 +21,12 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-ALLOWED_HOSTS = ['ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com',
+    '.shippa_order.com'
+    'localhost',
+    '127.0.0.1'
+]
 
 # Application definition
 
