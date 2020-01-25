@@ -15,7 +15,7 @@ class IsSelf(permissions.IsAuthenticated):
         if not authenticated:
             return False
 
-        user_id = view.kwargs['pk']
+        user_id = view.kwargs.get('pk', view.kwargs.get('user_id', None))
         user = get_object_or_404(User, pk=user_id)
         return request.user == user
 
@@ -26,6 +26,6 @@ class IsSelfReadOnly(permissions.IsAuthenticated):
         if not authenticated:
             return False
 
-        user_id = view.kwargs['pk']
+        user_id = view.kwargs.get('pk', view.kwargs.get('user_id', None))
         user = get_object_or_404(User, pk=user_id)
         return request.user == user and request.method in permissions.SAFE_METHODS
