@@ -23,7 +23,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 ALLOWED_HOSTS = [
     'ec2-13-125-254-245.ap-northeast-2.compute.amazonaws.com',
-    '.shippa_order.com'
+    '.shippa_order.com',
     'localhost',
     '127.0.0.1'
 ]
