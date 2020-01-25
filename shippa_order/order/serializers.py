@@ -31,6 +31,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
         )
 
     def validate_menu(self, value):
+        """
+        Validate Menu. Check if the given menu belongs to the merchant and is available.
+        :param value: Menu instance
+        :return: Validated Menu instance
+        """
         merchant_id = self.context.get('merchant_id')
 
         if value.merchant_id != merchant_id:
@@ -51,6 +56,14 @@ class OrderSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
+        """
+        Creates an order.
+        First create an Order object and then create all the OrderItem objects.
+        Then calculate the total_price of the order and save.
+        All above steps are done in an atomic transaction.
+        :param validated_data: validated payload data to create order and order items.
+        :return: Created Order object.
+        """
         order_item_data = validated_data.pop('order_items')
         with transaction.atomic():
             order = Order(**validated_data)
@@ -72,6 +85,15 @@ class OrderSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance: Order, validated_data):
+        """
+        Updates an Order object.
+        If 'status' field is being updated, check below.
+        - To 'COMPLETED', subtract 'total_price' of the Order from the User's 'points'.
+        - To be added...
+        :param instance: Order instance to be updated.
+        :param validated_data: Validated payload data for updating the Order object.
+        :return: Updated Order object.
+        """
         with transaction.atomic():
             status = validated_data.get('status', None)
             if status and status == instance.status:

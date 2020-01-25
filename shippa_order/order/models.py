@@ -36,6 +36,11 @@ class Order(models.Model):
 
     @staticmethod
     def calculate_total_price(order_items):
+        """
+        Calculates total_price of given OrderItems.
+        :param order_items: List of OrderItem objects or OrderItem dict.
+        :return: total price
+        """
         total_price = 0
         for item in order_items:
             if isinstance(item, OrderItem):
@@ -45,10 +50,18 @@ class Order(models.Model):
         return total_price
 
     def validate_total_price(self):
+        """
+        Check if the user has enough points to place this order.
+        :return:
+        """
         if self.user.points < self.total_price:
             raise ValidationError(f"{self.user.username} does not have enough points to place this order.")
 
     def save_total_price(self):
+        """
+        Saves total_price field of the order.
+        :return:
+        """
         order_items = self.order_items.all()
         self.total_price = self.calculate_total_price(order_items)
         self.validate_total_price()

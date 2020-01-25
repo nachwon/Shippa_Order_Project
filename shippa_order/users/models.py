@@ -10,6 +10,12 @@ class User(AbstractUser):
     points = models.PositiveIntegerField(default=configs.DEFAULT_POINTS)
 
     def spend_points(self, points):
+        """
+        Subtract given points from User's 'points'.
+        Creates related PointsLog object.
+        :param points: points to subtract.
+        :return:
+        """
         if not points:
             return
         if self.points < points:
@@ -25,6 +31,12 @@ class User(AbstractUser):
             ).save()
 
     def add_points(self, points):
+        """
+        Add given points to User's 'points'.
+        Creates related PointsLog object.
+        :param points: points to add.
+        :return:
+        """
         if not points:
             return
 
