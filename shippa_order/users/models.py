@@ -10,6 +10,8 @@ class User(AbstractUser):
     points = models.PositiveIntegerField(default=configs.DEFAULT_POINTS)
 
     def spend_points(self, points):
+        if not points:
+            return
         if self.points < points:
             raise ValidationError(message="Not enough points left.")
         self.points -= points
@@ -23,6 +25,9 @@ class User(AbstractUser):
             ).save()
 
     def add_points(self, points):
+        if not points:
+            return
+
         self.points += points
         with transaction.atomic():
             self.save()
