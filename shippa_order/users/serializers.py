@@ -112,7 +112,7 @@ class PointsLogSerializers(serializers.ModelSerializer):
     class Meta:
         model = PointsLog
         fields = [
-            "points_spent", "points_added", "created_at"
+            "points_spent", "points_added", "created_at", "points"
         ]
 
 
