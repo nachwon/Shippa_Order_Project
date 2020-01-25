@@ -36,8 +36,10 @@ class GoogleLoginView(views.APIView):
         token = request.data.get('id_token')
         if not token:
             raise BadRequest(detail="'id_token' is required.")
-
-        user_info = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
+        try:
+            user_info = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
+        except (TypeError, ValueError):
+            raise BadRequest(detail="Invalid 'id_token'.")
 
         email = user_info['email']
         username = email.split("@")[0]
