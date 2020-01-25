@@ -17,7 +17,7 @@ class IsSelf(permissions.IsAuthenticated):
 
         user_id = view.kwargs['pk']
         user = get_object_or_404(User, pk=user_id)
-        return request.user == user and request.method in permissions.SAFE_METHODS
+        return request.user == user
 
 
 class IsSelfReadOnly(permissions.IsAuthenticated):

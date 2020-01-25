@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 
 from users.models import User
-from users.serializers import UserSerializer, PointSerializer
+from users.serializers import UserSerializer
 from users import permissions as custom_permissions
 
 
