@@ -45,5 +45,5 @@ class UserOrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
+        user_id = self.kwargs.get('pk')
         return Order.objects.filter(user_id=user_id)
