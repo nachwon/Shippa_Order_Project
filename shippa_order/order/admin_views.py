@@ -5,6 +5,7 @@ from django.shortcuts import render
 # Merchant API 1. 주문 상태 변경
 from datetime import date
 from rest_framework import generics, permissions, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from order import exceptions
@@ -16,22 +17,14 @@ from order.serializers import OrderSerializer
 # 자기 가게의 주문 총 리스트 조회
 class OrderListView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    def get_queryset(self):
-        merchant_id = self.request.query_params.get('merchant_id')
-        if not merchant_id:
-            raise exceptions.InvalidParameter('merchant_id should be delivered.')
-
-        return Order.objects.filter(merchant_id=merchant_id)
-
     def get(self, request, *args, **kwargs):
-        # TODO : AdminUser의 merchant_id와 쿼리파라미터로 넘어온 merchant_id가 동일한지 체크 로직 필요?
         limit = request.query_params.get('limit', 10)
         offset = request.query_params.get('offset', 0)
-        resp = self.get_queryset().order_by('created_at')[offset: limit]
-
-        results = [self.serializer_class(r).data for r in resp]
+        order_objects = self.get_queryset().filter(merchant=self.kwargs['merchant_id'])[offset: limit]
+        results = [self.serializer_class(r).data for r in order_objects]
 
         return Response({
             'pagination': {
@@ -44,17 +37,40 @@ class OrderListView(generics.ListAPIView):
 
 
 # 특정 주문의 detail view 조회()
-class OrderDetailView(generics.RetrieveAPIView):
+class OrderRetrieveDestroy(generics.RetrieveDestroyAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = OrderSerializer
-    lookup_field = 'id'
+    lookup_field = 'merchant_id'
     queryset = Order.objects.all()
+
+    def get_object(self):
+        obj = self.get_queryset().get(id=self.kwargs['order_id'])
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def check_object_permissions(self, request, obj):
+        # merchant user check가 필요
+        if obj.merchant.id != self.kwargs['merchant_id']:
+            raise PermissionDenied
 
     def retrieve(self, request, *args, **kwargs):
         order_object = self.get_object()
         serializer = self.get_serializer(order_object)
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        change order status change to CANCELED when status is PENDING
+        """
+        obj = self.get_object()
+
+        serializer = self.get_serializer(obj, data={'status': 'CANCELED'}, partial=True)
+        serializer.is_valid()
+        serializer.save()
+
+        return Response(data={}, status=status.HTTP_204_NO_CONTENT)
 
 
 # 주문 상태 변경 API. 결제 취소로 상태 변경시 status 바꾸고 유저 포인트 복구까지. point log 테이블 insert는 자동으로 처리됨.
@@ -86,11 +102,7 @@ class OrderSalesReportView(generics.ListAPIView):
     queryset = Order.objects.all()
 
     def get_queryset(self):
-        merchant_id = self.request.query_params.get('merchant_id')
-
-        if not merchant_id:
-            raise exceptions.InvalidParameter('merchant_id should be delivered.')
-
+        merchant_id = self.kwargs['merchant_id']
         year = self.request.query_params.get('year')
         month = self.request.query_params.get('month')
         day = self.request.query_params.get('day')
