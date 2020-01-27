@@ -129,6 +129,7 @@ class MerchantOrderSalesReportView(generics.ListAPIView):
             raise exceptions.InvalidParameter('requested date should not be post-dated than today.')
 
         return Order.objects.filter(
+            merchant_id=merchant_id,
             created_at__year=parsed_date.year,
             created_at__month=parsed_date.month,
             created_at__day=parsed_date.day,
