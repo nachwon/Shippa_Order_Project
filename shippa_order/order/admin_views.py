@@ -81,16 +81,26 @@ class MerchantUpdateOrderStatusView(generics.UpdateAPIView):
     # queryset should be used for returning objects from this view
     queryset = Order.objects.all()
 
-    def get_queryset(self):
+    def get_object(self):
         order_id = self.kwargs['order_id']
-        return Order.objects.filter(id=order_id)
+        obj = self.get_queryset().get(id=order_id)
+
+        self.check_object_permissions(obj)
+        return obj
+
+    def check_object_permissions(self, request, obj):
+        # merchant user check가 필요
+        if obj.merchant.id != self.kwargs['merchant_id']:
+            raise PermissionDenied
 
     def patch(self, request, *args, **kwargs):
+        obj = self.get_object()
         status = request.data.get("status")
-        data = self.get_queryset()
-        self.serializer_class.update(data, status)
+        serializer = self.get_serializer(obj, data={'status': status}, partial=True)
+        serializer.is_valid()
+        serializer.update(obj, status)
 
-        return Response(data=None, status=status.HTTP_200_OK)
+        return Response(data=None, status=status.HTTP_204_NO_CONTENT)
 
 
 # Merchant API 2. 주문 매출 조회
