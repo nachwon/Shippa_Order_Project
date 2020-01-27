@@ -100,7 +100,8 @@ class PointSerializer(serializers.ModelSerializer):
             PointsLog(
                 user=instance,
                 points_spent=points_spent,
-                points_added=points_added
+                points_added=points_added,
+                points=instance.points
             ).save()
 
         return instance
@@ -111,7 +112,7 @@ class PointsLogSerializers(serializers.ModelSerializer):
     class Meta:
         model = PointsLog
         fields = [
-            "points_spent", "points_added", "created_at"
+            "points_spent", "points_added", "created_at", "points"
         ]
 
 
